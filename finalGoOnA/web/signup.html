@@ -1,0 +1,190 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Sign Up page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="js/jquery.mobile.min.css" /> 
+	<style>
+            .ui-page{
+                background: transparent url(images/background3.JPG) repeat center center;
+            }
+
+	</style>	
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.mobile.min.js"></script>
+        <script type="text/javascript" src="js/path.js"></script>
+
+	<script type="text/javascript">
+            
+                var rootURL=$path+"webresources/com.dn.entity.users";
+                
+		function addUser() {
+  			  $.ajax({
+       					type: 'POST',
+       					contentType: 'application/json; charset=utf-8',
+       					url: rootURL,
+       					dataType: "json",
+        				data: formToJSON(),
+       					success: function(data, textStatus, jqXHR){
+                                            document.location.href="#CreateOk";
+            				
+        				},
+        				error: function(jqXHR, textStatus, errorThrown){
+                                            document.location.href="#CreateFail";
+        				}
+   				 });
+		}
+
+
+		function formToJSON() {
+                    var useridCase=jQuery.trim($("#userid").val())+"";
+                    return JSON.stringify({
+     						"userid": useridCase.toUpperCase(),
+       						"password": $("#password").val(),
+                                                "latitude": "37.477972",
+                                                "longitude": "-121.925253"
+        					});
+		}
+
+
+		$(document).bind('pageinit', function(){
+
+			$('#submit').one("click",function() {
+                               
+  				if ((!(jQuery.trim($("#userid").val()).length > 0))
+					|| (!(jQuery.trim($("#password").val()).length > 0))
+						|| (!(jQuery.trim($("#reTypePassword").val()).length > 0)))
+				
+				{
+  					document.location.href="#alertBlank";
+				}
+
+				else if ($("#password").val() !== $("#reTypePassword").val())
+				{
+					document.location.href="#alertPassword";
+				}
+				else
+				{
+					
+					addUser();
+				}
+
+  				return false;
+			});
+
+
+			$("#myButton1").bind("click", function(event,ui){
+				document.location.href="login.html";
+			});
+                        
+                        $("#CreatOkButton").bind("click", function(event,ui){
+				document.location.href="signup.html";
+                        });
+                        
+                        $("#CreateFailButton").bind("click", function(event,ui){
+				document.location.href="signup.html";
+                        });
+                 
+                        $("#PassNoOkBtn").bind("click", function(event,ui){
+				document.location.href="signup.html";
+                        });
+                        
+                        $("#BlankOkBtn").bind("click", function(event,ui){
+				document.location.href="signup.html";
+                        });
+                        
+                        
+		});
+	</script>
+	</head> 
+<body> 
+
+<div data-role="page" id="signup">
+	<div data-role="header">
+		<h1>Sign Up</h1>
+	</div>
+
+	<div data-role="content">
+
+		
+	  	
+			<p>	
+	   			<label>User ID</label>
+	   		 	<input type="text" name="text" id="userid" value="" placeholder="User ID" data-theme="d"/>
+	   		</p>
+
+			<p>	
+	   			<label>Password</label>
+	   		 	<input type="password" name="password" id="password" value="" placeholder="Password" data-theme="d"/>
+	   		</p>
+
+			<p>	
+	   			<label>Re-type password</label>
+	   		 	<input type="password" name="password" id="reTypePassword" value="" placeholder="Password again" data-theme="d"/>
+	   		</p>
+
+			<input type="button" id="submit" value="Submit" data-theme="b" />
+ 			<a href="#" data-role="button" id="myButton1" data-theme="e">Go To Login</a>
+		
+	</div>
+</div>
+
+
+
+<div data-role="dialog" id="alertBlank">
+	<div data-role="header">
+		<h1>Blank field error</h1>
+	</div>
+	
+	<div data-role="content" data-theme="b">	
+		Please fill all fields
+		<br><br>
+
+		<a href="#signup" data-role="button" id="BlankOkBtn" data-theme="c">OK</a>
+	</div>
+</div>
+
+
+<div data-role="dialog" id="alertPassword">
+	<div data-role="header">
+		<h1>Password error</h1>
+	</div>
+	
+	<div data-role="content" data-theme="b">	
+		Password not match
+		<br><br>
+
+		<a href="#signup" data-role="button" id="PassNoOkBtn" data-theme="c" >OK</a>
+	</div>
+</div>
+
+    
+ <div data-role="dialog" id="CreateOk">
+            <div data-role="header">
+		<h1>Result</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		User created successfully!
+		<br><br>
+
+		<a href="#" data-role="button" id="CreatOkButton" data-theme="c">OK</a>
+            </div>
+        </div>
+        
+        <div data-role="dialog" id="CreateFail">
+            <div data-role="header">
+		<h1>Result</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		Create user Fail. User id existed!
+		<br><br>
+
+		<a href="#" data-role="button" id="CreateFailButton" data-theme="c">OK</a>
+            </div>
+        </div>
+    
+</body>
+</html>

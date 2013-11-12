@@ -1,0 +1,211 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Chat with someone page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" />
+	<style>
+	 .ui-page{
+                background: transparent url(../images/chat-background-icon2.jpg) repeat center center;
+            }
+	.senderstyle
+	{
+            float:left;
+
+            max-width:200px;
+            background-color:pink;
+            border-radius: 15px;
+            box-shadow: 10px 10px 5px #888888;
+            text-align:center;
+            word-wrap:break-word;
+        } 
+	
+        .receiverstyle
+	{
+            float:right;
+            background-color:#CCFF33;
+            border-radius: 15px;
+            max-width:200px;
+            box-shadow: 10px 10px 5px #888888;
+            text-align:center;
+            word-wrap:break-word;
+            
+        } 
+        </style>	
+        
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="../js/checkToken.js"></script>
+        
+	<script type="text/javascript">
+        var wsocket;   
+        var startChat="off";
+        function connect() {
+        var origin = $pathws+"chatchat";
+        wsocket = new WebSocket(origin);
+        //alert(origin);
+        wsocket.onmessage = onMessage;
+           
+          
+        }
+        
+        var rootURLChangeMessageStatus=$path+"webresources/api/changeMessageStatus";
+            function changeMessageStatus(messageidTmp) {
+            $.ajax({
+                        type: 'PUT',
+                        url: rootURLChangeMessageStatus + '/' + messageidTmp,
+                        success: function (result) {
+                            
+                        }
+                 });
+            }
+            
+            var rootURLgetAllUnseenMessages=$path+"webresources/api/getAllUnseenMessages";
+            var allUnseenMessages=null;
+            function getAllUnseenMessages(sender, receiver) {
+            $.ajax({
+                        type: 'GET',
+                        url: rootURLgetAllUnseenMessages + '/' + sender + '/' + receiver,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        processData: false, async: false,
+                        success: function (result) {
+                            
+                            allUnseenMessages=result;
+                        }
+                 });
+            } 
+            
+            function mountMessages(){
+                $.each(allUnseenMessages, function(key, val) {
+                  
+                    $("#showContent").append('<div class="receiverstyle">'+val.content+'</div>');
+                    var i=0;
+							for ( i=0; i<(val.content.length/19)+2;i++)
+							{
+								$("#showContent").append('<br>');
+							}
+           
+                });
+            }
+      
+      function onMessage(evt) {
+         
+         var msg = JSON.parse(evt.data);
+         if (msg.type==="SetupMessage")
+         {
+             if (msg.content==="send me your userid")
+             {
+                    var useridMsg = {};
+                    useridMsg.type = "UseridMessage";
+                    useridMsg.userid = $.session.get('userid');
+                    var jsonstr1 = JSON.stringify(useridMsg);
+                    wsocket.send(jsonstr1);
+             }
+             
+             if (msg.content==="chat starting")
+             {
+                 startChat = "on";
+             }
+                 
+         }
+         
+             if (msg.sender===$.url().param("someone"))
+            {
+             // $.playSound('sound.mp3');
+            
+             changeMessageStatus(msg.messageid);
+                $("#showContent").append('<div class="receiverstyle">'+msg.content+'</div>');
+                var i=0;
+							for ( i=0; i<(msg.content.length/19)+2;i++)
+							{
+								$("#showContent").append('<br>');
+							}
+            }
+    }
+      
+      
+      $(document).ready( function(){
+           checkToken();
+
+
+            var userid = $.session.get('userid');
+            var someone = $.url().param("someone");
+            $("#mainpage").append(userid+" -- "+someone);
+            
+            getAllUnseenMessages(someone,userid);
+            mountMessages();
+            
+            connect();
+           var sender = $.session.get('userid');
+            
+            var receiver = $.url().param("someone");
+            $("#sendButton").bind("click", function(event,ui){
+                
+               
+                
+                
+                
+                if (startChat==="on"){
+                   var content = $("#mesg").val()+"";      
+               content=jQuery.trim(content);
+               if (content.length>0){
+                var chatMsg = {};
+                chatMsg.type = "ChatMessage";
+                chatMsg.sender = sender;
+                chatMsg.receiver = receiver;
+                chatMsg.content = content;
+                chatMsg.messageid = "0";
+                var jsonstr = JSON.stringify(chatMsg);
+                wsocket.send(jsonstr);
+                $("#showContent").append('<div class="senderstyle">'+content+'</div>');
+                
+                var i=0;
+							for ( i=0; i<(content.length/19)+2;i++)
+							{
+								$("#showContent").append('<br>');
+							}
+                                                   $("#mesg").val("");
+                }
+                }
+             });
+             
+              $("#mainpageButton").bind("click", function(event,ui){
+                    var groupName = $.url().param("groupname");
+                  if ($.session.get('caller')==="chat")
+                    document.location.href="chatOneOneList.html?groupname="+groupName;
+                else
+                    document.location.href="messageBox.html";
+		});
+        });
+      
+	</script>
+	</head> 
+<body> 
+
+<div data-role="page" id="signup">
+	<div data-role="header">
+            <a href="#" id="mainpageButton" data-icon="back">Back</a>
+		<h1 id="mainpage"></h1>
+	</div>
+
+	<div data-role="content">
+            <div id="showContent"></div>
+            <div id="sendMessagePart">
+                <input type="text" name="text" id="mesg" value="" placeholder="Message" data-theme="d"/>
+                <input type="button" id="sendButton" value="Send" data-theme="b" />
+               
+                
+            </div>
+	</div>
+</div>
+
+
+
+
+</body>
+</html>

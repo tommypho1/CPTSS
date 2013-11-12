@@ -1,0 +1,231 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Main Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="js/jquery.mobile.min.css" /> 
+	<style>
+            .ui-page{
+                background: transparent url(images/background3.JPG) repeat center center;
+            }
+
+		/* center icons */
+		.ui-grid-a { text-align: center; }
+		
+		/* set row height */
+		.ui-block-a, .ui-block-b { height: 100px; }
+		
+		/* set label color, size */
+		.icon-label { color: #6495ed; display: block; font-size:14px; }
+		a:link,	a:visited, a:hover, a:active { text-decoration:none; }
+		
+			
+	</style>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.mobile.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <script type="text/javascript" src="js/checkToken1.js"></script>
+        <script type="text/javascript" src="js/path.js"></script>
+        <script type="text/javascript" src="js/updateLocation.js"></script>
+        <script type="text/javascript">
+            
+        
+            
+            
+            
+         var wsocket;   
+         var startChat="off";
+         
+         function blink(selector){
+            $(selector).fadeOut('slow', function(){
+                $(this).fadeIn('slow', function(){
+                    blink(this);
+                });
+            });
+        }
+         
+         var rootURLnotificationAlert=$path+"webresources/com.dn.entity.groupsandusers/api/notificationAlert";
+            
+         function notificationAlert(useridtmp) {
+            $.ajax({
+                        type: 'GET',
+                        url: rootURLnotificationAlert + '/' + useridtmp ,
+                        success: function (msg) {
+                        
+                          if (msg==="alert")
+                          {
+                            $("#requestGroup").show();
+                            blink('#requestGroup');}
+                          else
+                            $("#requestGroup").hide();
+                               
+                        }
+                 });
+            }
+            
+         var rootURLmessageAlert=$path+"webresources/api/messageAlert";
+            
+         function messageAlert(useridtmp) {
+            $.ajax({
+                        type: 'GET',
+                        url: rootURLmessageAlert + '/' + useridtmp ,
+                        
+                        success: function (msg) {
+                            
+                          if (msg==="alert")
+                          {
+                            $("#messageAlert").show();
+                            blink('#messageAlert');}
+                          else
+                            $("#messageAlert").hide();
+                               
+                        }
+                 });
+            }
+            
+            
+            
+            function connect() {
+            var origin =$pathws+"chatchat";
+            wsocket = new WebSocket(origin);
+            wsocket.onmessage = onMessage;
+            }
+            
+             function onMessage(evt) {
+                var msg = JSON.parse(evt.data);
+                if (msg.type==="SetupMessage")
+                {
+                    if (msg.content==="send me your userid")
+                    {
+                        var useridMsg = {};
+                        useridMsg.type = "UseridMessage";
+                        useridMsg.userid = $.session.get('userid');
+                        var jsonstr1 = JSON.stringify(useridMsg);
+                        wsocket.send(jsonstr1);
+                    }
+                }
+                if (msg.content==="chat starting")
+                {
+                     startChat = "on";
+                }
+                if (startChat === "on")
+                {
+                     messageAlert($.session.get('userid'));
+                }
+             }
+            
+            
+         
+         $(document).bind('pageinit', function(){
+                checkToken();
+
+                var userid = $.session.get('userid');
+ 
+                messageAlert(userid);
+                
+                var onOff = $.session.get('broadcast');
+                if (onOff==="on")
+                {
+                    updateLocation();
+                }
+
+               connect();
+                    $("#mainpage").append(userid);
+                  notificationAlert(userid);
+                
+                $("#logoutButton").bind("click", function(event,ui){
+                    $.session.clear();
+                    document.location.href="login.html";
+		});
+               
+                
+                //$("#messageAlert").hide();
+                
+               // blink('#messageAlert');
+                //blink('#requestGroup');
+              
+            });
+        </script>
+</head> 
+<body> 
+
+<div data-role="page" id="home" data-theme="d">
+	<div data-role="header" data-theme="b">
+		<h1 id="mainpage">Main Page <br></h1>
+	</div>
+
+	<div data-role="content">
+		<div class="ui-grid-a"> 
+                    
+                    <div class="ui-block-a">
+		   		<a href="#" id="logoutButton">
+			  		<img src="images/logout-icon.JPG" height="57" width="57">
+			  		<span class="icon-label">Logout</span>
+                                </a>
+			</div>
+                    
+                    
+                     <div class="ui-block-b">
+		   		<a href="userSettings/UserSettingsMainPage.html" id="UserSettings" data-transition="slide">
+			  		<img src="images/userSetting-icon1.JPG" height="57" width="57">
+			  		<span class="icon-label">User Settings</span>
+                                </a>
+			</div>
+                    
+			
+			<div class="ui-block-a">
+		   		<a href="friendLocation/trackingLocation.html" rel="external">
+			  		<img src="images/friendsLocation.jpg" height="57" width="57">
+			  		<span class="icon-label">Friends' Locations</span>
+                                </a>
+			</div>
+				
+			<div class="ui-block-b">
+		   		<a href="chat/chatMainPage.html" data-transition="slide">
+			  		<img src="images/chat-icon2.JPG" height="57" width="57">
+			  		<span class="icon-label">Chat</span>
+                                </a>
+			</div>	
+                        
+                    <div class="ui-block-a">
+		   		<a href="groupManagement/groupManagementMainPage.html" data-transition="slide">
+			  		<img src="images/group-icon1.jpg" height="57" width="57">
+			  		<span class="icon-label">Group Management</span>
+                                </a>
+                    </div>
+                    
+                    <div class="ui-block-b">
+		   		<a href="makeFriend/makeFriends.html" rel="external" >
+			  		<img src="images/makefriend-icon1.JPG" height="57" width="57">
+			  		<span class="icon-label">Make Friends</span>
+                                </a>
+                    </div>
+                    
+                    <div class="ui-block-a">
+		   		<a href="more/moreMainPage.html" data-transition="slide">
+			  		<img src="images/more-icon.JPG" height="57" width="57">
+			  		<span class="icon-label">More</span>
+                                </a>
+                    </div>
+                    
+                    <div class="ui-block-b" id="requestGroup">
+		   		<a href="notification.html" data-transition="slide" rel="external">
+			  		<img src="images/requestGroup-icon.JPG" height="57" width="57">
+			  		<span class="icon-label" id="blinking">Request Alert</span>
+                                </a>
+                    </div>
+                    
+                     <div class="ui-block-a" id="messageAlert">
+		   		<a href="chat/messageBox.html" data-transition="slide" rel="external">
+			  		<img src="images/mesg-icon.JPG" height="57" width="57">
+			  		<span class="icon-label" >Message Alert</span>
+                                </a>
+                    </div>
+                     
+		</div>
+	</div>
+</div>
+</body>
+</html>
+

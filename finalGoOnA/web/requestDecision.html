@@ -1,0 +1,92 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Request Decision page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="js/jquery.mobile.min.css" /> 
+	<style>
+            .ui-page{
+                background: transparent url(images/background3.JPG) repeat center center;
+            }
+            h1 {color:#ff1493;}
+
+		
+			
+	</style>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.mobile.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <script type="text/javascript" src="js/checkToken1.js"></script>
+        <script type="text/javascript" src="js/path.js"></script>
+        <script type="text/javascript" src="js/purl.js"></script>
+        <script type="text/javascript" src="js/updateLocation.js"></script>
+	<script type="text/javascript">
+            
+            
+            var rootURLjoinGroupRequestDecision=$path+"webresources/com.dn.entity.groupsandusers/api/joinGroupRequestDecision";
+       
+            function joinGroupRequestDecision(groupnameTmp, useridTmp, action, useridSpecialTmp) {
+            $.ajax({
+                        type: 'POST',
+                        url: rootURLjoinGroupRequestDecision + '/' + groupnameTmp +'/' + useridTmp +'/'+action +'/' + useridSpecialTmp,
+                        success: function (result) {
+                            document.location.href="notification.html";
+                        }
+                 });
+            }
+            
+            
+            
+            $(document).bind('pageinit', function(){
+               checkToken();
+                
+                
+                var groupnameParam = $.url().param("groupname");
+                var useridParam = $.url().param("userid");
+                var useridSpecial = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                
+               
+               
+                $("#OkButton").one("click", function(event,ui){
+                   joinGroupRequestDecision(groupnameParam, useridParam,"allow",useridSpecial);
+                    
+                 });
+                 
+                 $("#DenyButton").bind("click", function(event,ui){
+                    joinGroupRequestDecision(groupnameParam, useridParam,"deny", useridSpecial);
+                 });
+                
+               $("#NoDecisionButton").bind("click", function(event,ui){
+                    document.location.href="notification.html";
+		});
+
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="joinGroupConfirm">
+            <div data-role="header">
+		<h1>What's <br>your decision?</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		
+		<a href="#" id="OkButton" data-role="button" data-theme="c">Allow</a>
+                <a href="#" id="DenyButton" data-role="button" data-theme="c">Deny</a>
+                <a href="#" id="NoDecisionButton" data-role="button" data-theme="c">No Decision Now</a>
+            </div>
+            
+	</div>
+  
+     </body>
+</html>

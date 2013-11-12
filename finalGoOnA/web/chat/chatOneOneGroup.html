@@ -1,0 +1,103 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Total group page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" />
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+
+	</style>	
+	
+        <script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="../js/checkToken.js"></script>
+        <script type="text/javascript" src="../js/updateLocation.js"></script>
+        <script type="text/javascript">
+            var rootURLtotalGroupsOfUserid=$path+"webresources/com.dn.entity.groupsandusers/api/totalGroupsOfUserid";
+            
+            var listTotalGroupsOfUserid = null;
+            function gettotalGroups(id) {
+            $.ajax({
+                        type: 'GET',
+                        url: rootURLtotalGroupsOfUserid + '/' + id ,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        processData: false, async: false,
+                        success: function (msg) {
+                            listTotalGroupsOfUserid = msg;
+                            
+                          
+                        }
+                 });
+            }
+            
+            function mountGroupsToDiv(){
+
+                $.each(listTotalGroupsOfUserid, function(key, val) {
+                  
+                    $( "#listGroups" ).append('<li><a href="chatOneOneList.html?groupname=' + val+'" rel="external">'+val+' </a></li>').listview("refresh");
+           
+                });
+     
+           }
+           
+          
+            $(document).bind('pageinit', function(){
+               checkToken();
+                var userid = $.session.get('userid');
+                
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                  
+                gettotalGroups(userid);
+                mountGroupsToDiv();
+                
+                $("#mainpage").append(userid);
+                
+                $("#mainpageButton").bind("click", function(event,ui){
+                    document.location.href="../mainpage.html";
+		});
+               
+               
+
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="TotalGroups">
+            <div data-role="header">
+                <a href="#" id="mainpageButton" data-icon="back">Back</a>
+		<h1 id="mainpage">Total Groups<br></h1>
+                
+                
+            </div>
+
+	<div data-role="content">
+            
+           <ul data-role="listview" id="listGroups" data-autodividers="true" data-filter="true" data-filter-placeholder="Search...">
+               
+           </ul>
+
+            
+	</div>
+      </div>  
+        
+        
+        
+       
+    </body>
+</html>

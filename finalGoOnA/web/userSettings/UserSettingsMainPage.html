@@ -1,0 +1,94 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>User Setting Main Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" /> 
+	<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+
+		/* center icons */
+		.ui-grid-a { text-align: center; }
+		
+		/* set row height */
+		.ui-block-a, .ui-block-b { height: 100px; }
+		
+		/* set label color, size */
+		.icon-label { color: #6495ed; display: block; font-size:14px; }
+		a:link,	a:visited, a:hover, a:active { text-decoration:none; }
+		
+			
+	</style>
+	
+
+         <script type="text/javascript">
+            
+        
+         </script>
+         
+</head> 
+<body> 
+
+<div data-role="page" id="home" data-theme="d">
+	<div data-role="header" data-theme="b">
+            <a href="../mainpage.html" data-icon="back" rel="external">Back</a>
+		<h1 id="mainpage1">Setting Page <br></h1>
+               
+	</div>
+
+	<div data-role="content">
+		<div class="ui-grid-a"> 
+                    
+                    <div class="ui-block-a">
+		   		<a href="changePassword.html" rel="external">
+			  		<img src="../images/passwordChange-icon.JPG" height="57" width="57">
+			  		<span class="icon-label">Change Password</span>
+                                </a>
+			</div>
+                    
+                    
+                     <div class="ui-block-b">
+		   		<a href="locationSetting.html" rel="external">
+			  		<img src="../images/broadcastPosition-icon.JPG" height="57" width="57">
+			  		<span class="icon-label">Location Setting</span>
+                                </a>
+			</div>
+                    
+			
+                    
+		</div>
+            
+             <script src="../js/jquery.min.js"></script>
+             <script src="../js/jquery.mobile.min.js"></script>
+             <script src="../js/jquery.session.js"></script>
+             <script type="text/javascript" src="../js/path.js"></script>
+             <script type="text/javascript" src="../js/updateLocation.js"></script>
+             <script type="text/javascript">
+            
+                //alert("1");
+             
+                clearInterval(timer1);
+                var token = $.session.get('token');
+                if (token===undefined)
+                {
+                    document.location.href="../login.html";
+                }
+                var userid = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                if (onOff==="on")
+                  {
+                        updateLocation();
+                  }
+                
+                $("#mainpage1").append(userid);
+               
+         
+            </script>
+	</div>
+</div>
+</body>
+</html>
+

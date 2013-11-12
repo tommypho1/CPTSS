@@ -1,0 +1,114 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Car Trace Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" />
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+            h1 {color:#00ffff;}
+	</style>	
+	
+        <script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="../js/checkToken.js"></script>
+        
+	<script type="text/javascript">
+
+        var timer1;
+        
+        
+        function getLocation(){
+            if ( navigator.geolocation ) {
+                function successUpdate(pos) {
+                      
+                    //alert($path+"webresources/com.dn.entity.groupsandusers/api/editUserLocation");
+                   // if ((Math.abs(pos.coords.latitude-currentLat)>0.000099) && (Math.abs(pos.coords.currentLat-lng)>0.000099))
+                   //    {
+                   alert("Save successfully");
+                       // alert(pos.coords.latitude+" "+pos.coords.longitude);
+
+                        $.session.set('currentCarLat', pos.coords.latitude);
+                        $.session.set('currentCarLng', pos.coords.longitude);
+                       // document.location.href="#OK";
+                  //  }
+                }
+                
+                function fail(error) {
+                  alert("Save fail");
+                }
+                // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
+                //navigator.geolocation.getCurrentPosition(success, fail, {maximumAge: 500000, enableHighAccuracy:true, timeout: 6000});
+               navigator.geolocation.getCurrentPosition(successUpdate, fail, {maximumAge: 500, enableHighAccuracy:true, timeout: 6000});
+            } 
+            else {
+                alert("Not support Location");
+               // clearInterval(timer1);
+            }
+        }
+         
+           $(document).bind('pageinit',function(){
+                   checkToken();
+
+                var userid = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                  
+                   
+                    $("#saveLocation").bind("click", function(){
+                        getLocation();
+                        
+                    });
+                     $("#seeLocation").bind("click", function(){
+                        document.location.href="carMap2.html";
+                    });
+		});
+	</script>
+	</head> 
+<body> 
+
+
+<div data-role="page" id="CarTrace">
+	<div data-role="header">
+             <a href="moreMainPage.html" id="backButton" data-icon="back" rel="external">Back</a>
+		<h1>Car Trace</h1>
+	</div>
+            
+            
+           <div data-role="content">
+               <a href="#" data-role="button" id="saveLocation">Save Car Location</a>
+                <a href="#" data-role="button" id="seeLocation">See Car Location</a>
+		
+		
+					
+	</div>
+	
+
+
+</div>
+<div data-role="dialog" id="OK">
+            <div data-role="header">
+		<h1>Result</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		Car Location is saved.
+		<br><br>
+
+		<a href="#" data-role="button" id="failButton" data-theme="c">OK</a>
+            </div>
+        </div>
+        
+</body>
+</html>

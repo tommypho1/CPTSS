@@ -1,0 +1,106 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Python Fun</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" /> 
+	<style>
+            #para1
+            {
+                background-color:cyan;
+                color:black;
+            } 
+
+	</style>
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+         <script type="text/javascript" src="../js/path.js"></script>
+         <script type="text/javascript" src="../js/checkToken.js"></script>
+        <script type="text/javascript" src="../js/updateLocation.js"></script>
+        
+        <script type="text/javascript">
+            
+      
+         var urlString = $path+"webresources/api/pythonProcess";
+         function pythonProcess(code) {
+            $.ajax({
+                        type: 'POST',
+                        url: urlString+"/"+code ,
+                        
+                        success: function (msg) {               
+                              // alert(msg);
+                               $("#result").append("<p id='para1'>"+msg+"</p>"+"<br>"+"<p  style='text-align:center;'>--------------</p>"+"<br>");
+                               
+                        },
+                        error: function(error){
+                               // alert("fail");
+                    
+                        }
+                        
+                        
+                 });
+            }
+
+            
+           
+            
+           $(document).bind('pageinit',function(){
+                    checkToken();
+
+                var userid = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                   
+                   
+                    $("#run").bind("click", function(){
+                        var myTextareaVal=$("#textarea").val();
+                        myTextareaVal = myTextareaVal.replace(/\t/g,"<tab>");
+                        var myLineBreak = myTextareaVal.replace(/\n/g,"<br>");
+                        pythonProcess(myLineBreak);
+                    });
+                    
+                     $('#textarea').keydown(function(e) {
+                            if(e.keyCode == 9) {
+      var start = $(this).get(0).selectionStart;
+      $(this).val($(this).val().substring(0, start) + "\t" + $(this).val().substring($(this).get(0).selectionEnd));
+      $(this).get(0).selectionStart = $(this).get(0).selectionEnd = start + 1;
+      return false;
+    }
+  });
+
+                    
+		});
+	</script>
+	</head> 
+<body> 
+
+
+<div data-role="page" id="earthquake">
+	<div data-role="header">
+            <a href="moreMainPage.html" id="backButton" data-icon="back" rel="external">Back</a>
+		<h1>Python Fun</h1>
+	</div>
+            
+            
+           <div data-role="content">
+               <div id ="result" style="color:blue;"></div>
+            <textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+            <a href="#" data-role="button" id="run">Run</a>
+            
+		
+					
+	</div>
+	
+
+
+</div>
+
+        
+</body>
+</html>

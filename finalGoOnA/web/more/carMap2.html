@@ -1,0 +1,134 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Car Map page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" />
+	
+        <style>
+		#map-page, #map-canvas { width: 100%; height: 100%; padding: 0; }
+	</style>
+	 <script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="../js/checkToken.js"></script>
+        
+	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        
+        <script type="text/javascript">
+            
+            var map;
+            var zoomtemp=19;
+            var once=1;
+            var timer1;
+            
+            var currentCarLat=0;
+            var currentCarLng=0;
+            var currentLat=0;
+            var currentLng=0;
+            
+            function YourLocation(){
+            if ( navigator.geolocation ) {
+                function successUpdate(pos) {                  
+                    if ((Math.abs(pos.coords.latitude-currentLat)>0.000099) || (Math.abs(pos.coords.currentLat-currentLng)>0.000099))
+                       {
+                        //alert(pos.coords.latitude+" "+pos.coords.longitude);
+                        currentLat = pos.coords.latitude;
+                        currentLng = pos.coords.longitude;              
+                        
+                        if (once===1)
+                            {
+                                zoomtemp=19;once=0;
+                                
+                            }
+                            else
+                                {zoomtemp=map.getZoom();}
+                        
+                        mapShow();
+                    }                   
+                }
+                
+                function fail(error) {
+                    //alert("fail to get current location");
+                }
+                navigator.geolocation.getCurrentPosition(successUpdate, fail, {maximumAge: 500, enableHighAccuracy:true, timeout: 6000});
+                timer1 = setInterval(function(){navigator.geolocation.getCurrentPosition(successUpdate, fail, {maximumAge: 500, enableHighAccuracy:true, timeout: 6000});},10000);
+            } 
+            else {
+                alert("Not support Location");
+                clearInterval(timer1);
+            }
+        }
+        
+             function mapShow() {
+             //alert(currentCarLat);
+                var latLng = new google.maps.LatLng(currentLat, currentLng);
+                
+                map = new google.maps.Map(document.getElementById('map-canvas'), {
+                        zoom: zoomtemp,
+                        center: latLng,
+                        
+                        mapTypeId: 'satellite'
+                        });
+                
+                 
+                var car = new google.maps.Marker({
+                    position: new google.maps.LatLng(currentCarLat, currentCarLng),
+                    draggable: false,
+                    zIndex: 1,
+                    map: map,
+                    optimized: false,
+                 
+                    icon: new google.maps.MarkerImage("http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|"+"Car"+"|CCFF99|000000", null, null, new google.maps.Point(0, 42))
+                });
+                
+                var you = new google.maps.Marker({
+                    position: new google.maps.LatLng(currentLat, currentLng),
+                    draggable: false,
+                    zIndex: 1,
+                    map: map,
+                    optimized: false,
+                 
+                    icon: new google.maps.MarkerImage("http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|"+"You"+"|CCFF99|000000", null, null, new google.maps.Point(0, 42))
+                });
+            }
+        
+            $(document).bind('pageinit',function(){
+                checkToken();
+
+                var userid = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                
+               currentCarLat = $.session.get('currentCarLat');
+               currentCarLng = $.session.get('currentCarLng');
+              YourLocation();
+               
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="map-page">
+            <div data-role="header">
+                <a href="carRemember.html" id="backButton" data-icon="back" rel="external">Back</a>
+		<h1 id="mainpage"> Car <br> Location <br></h1>
+                
+                
+            </div>
+
+	<div data-role="content" id="map-canvas">
+	</div>
+         
+      </div>  
+    </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Delete Group Confirmation page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" /> 
+        <style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+            </style>
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="checkToken.js"></script>
+	<script type="text/javascript">
+            
+            
+            var rootURLdeleteGroup=$path+"webresources/com.dn.entity.groupsandusers/api/deleteGroup";
+
+            function deleteGroup(groupnameTmp) {
+            $.ajax({
+                        type: 'DELETE',
+                        url: rootURLdeleteGroup + '/' + groupnameTmp,
+                        success: function (result) {
+                            document.location.href="deleteGroup.html";
+                        }
+                 });
+            }
+            
+            
+            
+            $(document).bind('pageinit', function(){
+               checkToken();
+                
+                
+                var groupnameParam = $.url().param("groupname");
+               
+
+               
+                $("#deleteYesButton").one("click", function(event,ui){
+                    deleteGroup(groupnameParam);
+                });
+                
+                $("#deleteNoButton").bind("click", function(event,ui){
+                   document.location.href="deleteGroup.html";
+		});
+                        
+                
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="deleteConfirm">
+            <div data-role="header">
+		<h1>Do you want <br> to delete <br> this group?</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		
+		<a href="#" id="deleteYesButton" data-role="button" data-theme="c">Yes</a>
+                <a href="#" id="deleteNoButton" data-role="button" data-theme="c">No</a>
+            </div>
+            
+	</div>
+  
+     </body>
+</html>

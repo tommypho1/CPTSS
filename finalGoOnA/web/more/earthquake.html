@@ -1,0 +1,118 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Earthquake Info</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" /> 
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+            h1 {color:#ff1493;}
+            div {color:#00ff00;}
+
+	</style>
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+         <script type="text/javascript" src="../js/path.js"></script>
+         <script type="text/javascript" src="../js/checkToken.js"></script>
+        <script type="text/javascript" src="../js/updateLocation.js"></script>
+        
+        <script type="text/javascript">
+         var place;
+         var latStr;
+         var lngStr;
+         var magStr;
+         var timeStr;
+         var info;
+         var lat;
+         var lng;
+         var mag;
+         var urlString = $path+ "webresources/api/earthquakeInfo";
+         function earthquake() {
+            $.ajax({
+                        type: 'GET',
+                        url: urlString ,
+                        dataType: 'json',
+                        success: function (msg) {               
+                               $.each(msg.features, function(i,v){
+                                    place=v.properties.place;
+                                    lat=v.geometry.coordinates[1];
+                                    lng=v.geometry.coordinates[0];
+                                    mag=v.properties.mag;
+                                    latStr="Latitude: "+lat;
+                                    lngStr="Longitude: "+lng;
+                                    magStr = "Magnitude: "+mag;
+                                    timeStr = "Time: "+ new Date(v.properties.time);
+                                    timeStr=timeStr.substring(0,31);
+                                    info = latStr+"<br>"+lngStr+"<br>"+magStr+"<br>"+timeStr;
+
+                                      $("#lis").append('<li data-role="list-divider"><a href="showMapEarthquakeOne.html?lat='+lat+'&lng='+lng+'&mag='+mag+'" rel="external">'+place+'</a></li>').listview("refresh");
+                                      $("#lis").append('<li><p>'+info+'</p></li>').listview("refresh");
+                                });
+;
+                        },
+                        error: function(error){
+                                alert("fail");
+                    
+                        }
+                        
+                        
+                 });
+            }
+
+            
+           
+            
+           $(document).bind('pageinit',function(){
+                checkToken();
+
+                var userid = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                   
+                   earthquake();
+                   
+                    $("#refresh").bind("click", function(){
+                        document.location.href="earthquake.html";
+                    });
+                     $("#showMap").bind("click", function(){
+                        document.location.href="showMapEarthquake.html";
+                    });
+		});
+	</script>
+	</head> 
+<body> 
+
+
+<div data-role="page" id="earthquake">
+	<div data-role="header">
+            <a href="moreMainPage.html" id="backButton" data-icon="back" rel="external">Back</a>
+		<h1>Earthquake</h1>
+	</div>
+            
+            
+           <div data-role="content">
+               <a href="#" data-role="button" id="showMap">Show Map</a>
+                <a href="#" data-role="button" id="refresh">Refresh</a>
+		<ul data-role="listview" data-inset="true" data-theme="e" id="lis">
+			
+
+		</ul>	
+		
+					
+	</div>
+	
+
+
+</div>
+
+        
+</body>
+</html>

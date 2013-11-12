@@ -1,0 +1,131 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Create Group Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" /> 
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+
+	</style>
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+         <script type="text/javascript" src="../js/path.js"></script>
+         <script type="text/javascript" src="checkToken.js"></script>
+         <script src="../js/purl.js"></script>
+         <script type="text/javascript" src="../js/updateLocation.js"></script>
+	<script type="text/javascript">
+            
+            var rootURLgroupOwner=$path+"webresources/com.dn.entity.groupnameandowner/api/createGroupNoSpecial";
+            function CreateGroup(groupnameTmp, useridTmp) {
+ 
+                        $.ajax({
+       					type: 'POST',
+       					url: rootURLgroupOwner + '/' + groupnameTmp + '/' + useridTmp,
+       					
+       					success: function(data, textStatus, jqXHR){
+            					
+                                                document.location.href="#CreateOk";
+        				},
+        				error: function(jqXHR, textStatus, errorThrown){
+            					//alert('Create group: ' + textStatus +". Group existed");
+                                                document.location.href="#CreateFail";
+        				}
+   				 });
+		}
+
+            
+           
+            
+            
+            
+            $(document).bind('pageinit', function(){
+               checkToken();
+
+                var userid = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                
+                $("#mainpage").append(userid);
+                
+                
+                
+                $("#createGroupButton").bind("click", function(event,ui){
+                    var groupnameCase = jQuery.trim($("#nameGroup").val())+"";
+                    
+                   CreateGroup(groupnameCase.toUpperCase(),$.session.get('userid'));
+                   // document.location.href="mainpage.html";
+		});
+                
+                 $("#CreatOkButton").bind("click", function(event,ui){
+				document.location.href="createGroup.html";
+                    });
+                 
+                 $("#CreateFailButton").bind("click", function(event,ui){
+				document.location.href="createGroup.html";
+                    });
+                    
+               
+
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="CreateGroupPage">
+            <div data-role="header">
+                <a href="groupManagementMainPage.html" data-icon="back" rel="external">Back</a>
+		<h1 id="mainpage">Create Group <br> </h1>
+                
+                
+            </div>
+
+	<div data-role="content">
+            <label for="name">Enter group name</label>
+            <input type="text" name="name" id="nameGroup" value=""  />
+           
+            <input type="submit" id="createGroupButton" value="Create" data-theme="b" />
+            
+            
+            
+	</div>
+             
+      </div>  
+        
+        <div data-role="dialog" id="CreateOk">
+            <div data-role="header">
+		<h1>Result</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		Successful group creation!
+		<br><br>
+
+		<a href="#" data-role="button" id="CreatOkButton" data-theme="c">OK</a>
+            </div>
+        </div>
+        
+        <div data-role="dialog" id="CreateFail">
+            <div data-role="header">
+		<h1>Result</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		Group name existed. Try different name!
+		<br><br>
+
+		<a href="#" data-role="button" id="CreateFailButton" data-theme="c">OK</a>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>List User Chat page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" />
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+
+	</style>	
+	
+        <script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="../js/checkToken.js"></script>
+         <script type="text/javascript" src="../js/updateLocation.js"></script>
+	<script type="text/javascript">
+           
+            
+           
+            var groupName;
+            
+            var rootURLgroupOwnerWithUserid=$path+"webresources/com.dn.entity.groupsandusers/api/totalUsersOfGroup";
+            
+            var listAllUsersOfGroup = null;
+            function getAllUsersOfGroup(groupname) {
+            $.ajax({
+                        type: 'GET',
+                        url: rootURLgroupOwnerWithUserid + '/' + groupname ,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        processData: false, async: false,
+                        success: function (msg) {
+                            listAllUsersOfGroup = msg;
+                          
+                        }
+                 });
+            }
+            
+          
+            
+            function mountUsersToDiv(){
+                $.each(listAllUsersOfGroup, function(key, val) {
+                  if (!(val===$.session.get('userid')))
+                     $( "#listUsers" ).append('<li><a href="#">'+val+'</a> <a href="chatWithSomeone.html?someone='+val+'&groupname='+groupName+'" rel="external" ></a></li>').listview("refresh");
+                });
+           }
+            
+            $(document).bind('pageinit', function(){
+               checkToken();
+                
+                
+                var userid = $.session.get('userid');
+                
+                var onOff = $.session.get('broadcast');
+                 if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                groupName = $.url().param("groupname");
+               // var groupName = userid+"'S SPECIAL GROUP";
+                
+                $.session.set('caller', "chat");
+                getAllUsersOfGroup(groupName);
+                mountUsersToDiv();
+                
+                $("#mainpage").append(userid);
+                
+               
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="YourOwnGroups">
+            <div data-role="header">
+                <a href="chatOneOneGroup.html" data-icon="back" rel="external">Back</a>
+		<h1 id="mainpage">List Users <br> </h1>
+                
+                
+            </div>
+
+	<div data-role="content">
+            
+           <ul data-role="listview"  data-autodividers="true" data-theme="c"  id="listUsers">
+               
+           </ul>
+
+            
+	</div>
+ 
+      </div>  
+
+    </body>
+</html>

@@ -1,0 +1,129 @@
+
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Login page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="js/jquery.mobile.min.css" /> 
+	<style>
+            .ui-page{
+                background: transparent url(images/background3.JPG) repeat center center;
+            }
+
+	</style>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.mobile.min.js"></script>
+        <script src="js/jquery.session.js"></script>
+        <script type="text/javascript" src="js/path.js"></script>
+	<script type="text/javascript">
+            
+            var rootURLusers=$path+"webresources/com.dn.entity.users";
+            
+            function findById(id) {
+            $.ajax({
+                        type: 'GET',
+                        url: rootURLusers + '/' + id ,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        processData: false, async: false,
+                        success: function (msg) {
+
+                            var userid = msg.userid;
+                            var pass = $("#password").val()+"";
+                            pass = pass.toLocaleUpperCase();
+                            var passDB = msg.password;
+                            if (pass===passDB)
+                            { 
+
+                                $.session.set('userid', userid);
+                                $.session.set('password', pass);
+                                $.session.set('token', "yes");
+                                
+                                $.session.set('latitude', msg.latitude);
+                                $.session.set('longitude', msg.longitude);
+                                
+                                $.session.set('broadcast', "off");
+                                document.location.href="mainpage.html";
+                            }
+                            else
+                            {
+                                document.location.href="#fail";
+                            }
+                
+                               
+                        },
+                        error: function(jqXHR, textStatus, errorThrown){
+                            document.location.href="#fail";
+                        }
+                 });
+            }
+
+            
+           
+            
+           $(document).bind('pageinit',function(){
+                   
+                   
+                   
+                    $("#signupButton").bind("click", function(event,ui){
+				document.location.href="signup.html";
+                    });
+                    
+                     $("#failButton").bind("click", function(event,ui){
+				document.location.href="login.html";
+                    });
+                    
+                    $("#submit").bind("click", function(){
+                        var id = $("#userid").val()+"";
+                        findById(id.toUpperCase());
+                    });
+		});
+	</script>
+	</head> 
+<body> 
+
+
+<div data-role="page" id="signup">
+	<div data-role="header">
+		<h1>Login</h1>
+	</div>
+
+	<div data-role="content">
+           
+		<form id="loginForm" action="#" method="post">
+	  	
+			<p>	
+	   			<label for="text">User ID</label>
+	   		 	<input type="text" name="userid" id="userid" value="" placeholder="User ID" data-theme="d"/>
+	   		</p>
+
+			<p>	
+	   			<label for="text">Password</label>
+	   		 	<input type="password" name="password" id="password" value="" placeholder="Password" data-theme="d"/>
+	   		</p>
+
+
+			<input type="submit" id="submit" value="Log in" data-theme="b" />
+			<a href="#" data-role="button" id="signupButton" data-theme="e">Sign Up</a>
+		</form>	
+           
+	</div>
+</div>
+
+        <div data-role="dialog" id="fail">
+            <div data-role="header">
+		<h1>Result</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		Login fails. Try again!
+		<br><br>
+
+		<a href="#" data-role="button" id="failButton" data-theme="c">OK</a>
+            </div>
+        </div>
+
+</body>
+</html>

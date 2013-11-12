@@ -1,0 +1,178 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Show Map page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" />
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+
+	</style>
+        <style>
+		#map-page, #map-canvas { width: 100%; height: 100%; padding: 0; }
+	</style>
+	
+        <script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="../js/checkToken.js"></script>
+        <script type="text/javascript" src="../js/updateLocation.js"></script>	
+	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        
+        <script type="text/javascript">
+            var currentSum=0;
+            var Sum=0;
+            var map;
+            var detect=0;
+            var latlngGlobal;
+            var zoomGlobal;
+            var rootURLgetListUserEntityFromListUserid=$path+"webresources/com.dn.entity.groupsandusers/api/getListUserEntityFromListUserid";
+            
+            var ListUserEntity = null;
+            function getListUserEntity(listUseridString) {
+            $.ajax({
+                        type: 'GET',
+                        url: rootURLgetListUserEntityFromListUserid + '/' + listUseridString ,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        processData: false, async: false,
+                        success: function (msg) {
+                            //alert("ok");
+                            ListUserEntity = msg;
+                            
+                          
+                        }
+                 });
+            }
+            
+            var markerArray = new Array();
+            
+            function markerCreate(name, lat, lng, index){
+                var latLngTmp = new google.maps.LatLng(lat, lng);
+                
+                markerArray[index] = new google.maps.Marker({
+                    position: latLngTmp,
+                    draggable: false,
+                    zIndex: 1,
+                    map: map,
+                    optimized: false,
+                    icon: new google.maps.MarkerImage("http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|"+name+"|FF8080|000000", null, null, new google.maps.Point(0, 42))
+                });
+               // markerArray.push(markerTmp);
+            }
+            
+            function mapShow() {
+                //alert("reload");
+                var latLng = new google.maps.LatLng(ListUserEntity[0].latitude, ListUserEntity[0].longitude);
+                if (detect===0)
+                    {
+                      latlngGlobal=latLng;
+                      
+                      map = new google.maps.Map(document.getElementById('map-canvas'), {
+                        zoom: 11,
+                        center: latlngGlobal,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+                    }
+                else{
+                    latlngGlobal=map.getCenter();
+                    zoomGlobal=map.getZoom();
+
+                    map = new google.maps.Map(document.getElementById('map-canvas'), {
+                        zoom: 11,
+                        center: latlngGlobal,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+                   
+                   
+                    map.setZoom(zoomGlobal);
+                }
+                 detect=detect+1;
+                
+                 
+
+                $.each(ListUserEntity, function(key, val) {
+                   
+                   markerCreate(val.userid, val.latitude, val.longitude, key);
+                   
+               });
+                
+        
+ 
+        
+            }
+          
+            $(document).ready(function(){
+               checkToken();
+               var timer;
+               var userid = $.session.get('userid');
+               var onOff = $.session.get('broadcast');
+               if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                
+                var listUsersShowMapString =  $.session.get('listUsersShowMap');
+               // var listUsersShowMapArray = listUsersShowMapString.split(',');
+                $("#mainpage").append(userid);
+                
+                $("#backButton").bind("click", function(event,ui){
+                    clearInterval(timer);
+                    var groupnameAttr = $.session.get('groupNameAttr');
+                    
+                    document.location.href="trackingLocationTotalUsersOfGroup.html?groupname="+groupnameAttr;
+                   
+		});
+               
+                getListUserEntity(listUsersShowMapString);
+                                    mapShow();
+                timer = setInterval(function(){
+                                    getListUserEntity(listUsersShowMapString);
+                                    currentSum=0;
+                                     $.each(ListUserEntity, function(key, val) {
+                   
+                  
+                  currentSum=currentSum+val.latitude+val.longitude;
+                   
+               });
+                                   // alert(currentSum+"   "+Sum);
+                                    if (currentSum===Sum){}
+                                    else{
+                                        Sum=currentSum;
+                                        mapShow();
+                                    }
+                                    
+                                
+    },20000);
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="map-page">
+            <div data-role="header">
+                <a href="#" id="backButton" data-icon="back">Back</a>
+		<h1 id="mainpage">Location Users<br></h1>
+                
+                
+            </div>
+
+	<div data-role="content" id="map-canvas">
+		<!-- map loads here... -->
+	</div>
+            
+            
+      </div>  
+        
+        
+        
+       
+    </body>
+</html>

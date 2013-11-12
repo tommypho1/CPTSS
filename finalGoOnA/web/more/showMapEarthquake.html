@@ -1,0 +1,154 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Earthquake Map</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" /> 
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+            h1 {color:#ff1493;}
+            div {color:#00ff00;}
+            #map-page, #map-canvas { width: 100%; height: 100%; padding: 0; }
+
+	</style>
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+         <script type="text/javascript" src="../js/path.js"></script>
+         <script type="text/javascript" src="../js/checkToken.js"></script>
+        <script type="text/javascript" src="../js/updateLocation.js"></script>
+        <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        
+        <script type="text/javascript">
+            var msg;
+            var markerArray = new Array();
+            var map;
+            var latLngTmp;
+            var lat1;
+            var lng1;
+            
+            var urlString = $path+ "webresources/api/earthquakeInfo";
+                function earthquake() {
+                    $.ajax({
+                        type: 'GET',
+                        url: urlString ,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        processData: false, async: false,
+                        success: function (msg1) {               
+                               msg=msg1;
+                               
+                        },
+                        error: function(error){
+                                alert("fail");
+                    
+                        }
+                        
+                        
+                 });
+            }
+            
+             function mapShow() {
+                var latLng = new google.maps.LatLng(34.0983425, -118.3267434);
+                map = new google.maps.Map(document.getElementById('map-canvas'), {
+                        zoom: 2,
+                        center: latLng,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+                
+                 
+          
+                
+                 $.each(msg.features, function(i,v){
+                      lng1 = parseFloat(v.geometry.coordinates[0]);
+                      lat1 = parseFloat(v.geometry.coordinates[1]);
+                     
+                     var mag = v.properties.mag;
+                     
+                     
+                     markerCreate(mag, lat1, lng1, i);
+                     
+                });
+                               
+                              
+
+
+            }
+            
+            function markerCreate(mag, lat, lng, index){
+                
+                latLngTmp = new google.maps.LatLng(lat,lng);
+                
+                if (mag < 5){
+
+                var lll = new google.maps.Marker({
+                    position: latLngTmp,
+                    draggable: false,
+                    zIndex: 1,
+                    map: map,
+                    optimized: false,
+                    icon: new google.maps.MarkerImage("http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|"+mag+"|CCFF99|000000", null, null, new google.maps.Point(0, 42))
+                });
+                }
+                else
+                    {
+                        var lll = new google.maps.Marker({
+                    position: latLngTmp,
+                    draggable: false,
+                    zIndex: 1,
+                    map: map,
+                    optimized: false,
+                    icon: new google.maps.MarkerImage("http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|"+mag+"|FF0000|000000", null, null, new google.maps.Point(0, 42))
+                });
+                    }
+                
+              
+            }
+              
+          
+            $(document).ready(function(){
+                
+                 checkToken();
+
+                var userid = $.session.get('userid');
+                var onOff = $.session.get('broadcast');
+                
+                   if (onOff==="on")
+                  {
+                      updateLocation();
+                  }
+                $("#backButton").bind("click", function(event,ui){
+                    document.location.href="earthquake.html";
+                   
+		});
+               earthquake();
+               mapShow();
+               
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="map-page">
+            <div data-role="header">
+                <a href="#" id="backButton" data-icon="back">Back</a>
+		<h1 id="mainpage"> EarthQuake <br> Locations <br></h1>
+                
+                
+            </div>
+
+	<div data-role="content" id="map-canvas">
+	</div>
+            
+            
+      </div>  
+        
+        
+        
+       
+    </body>
+</html>

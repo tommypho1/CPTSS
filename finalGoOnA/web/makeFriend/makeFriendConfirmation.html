@@ -1,0 +1,78 @@
+<!DOCTYPE html> 
+
+<html> 
+	<head> 
+	<meta charset="utf-8">
+	<title>Make Friend Confirmation page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../js/jquery.mobile.min.css" />
+		<style>
+            .ui-page{
+                background: transparent url(../images/background3.JPG) repeat center center;
+            }
+            h1 {color:#ff0000;}
+	</style>	
+	
+        <script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.mobile.min.js"></script>
+        <script src="../js/jquery.session.js"></script>
+        <script type="text/javascript" src="../js/path.js"></script>
+        <script src="../js/purl.js"></script>
+        <script type="text/javascript" src="../js/checkToken.js"></script>
+        
+	<script type="text/javascript">
+            
+            
+            var rootURLjoinGroupRequestFromUser=$path+"webresources/com.dn.entity.groupsandusers/api/joinGroupRequestFromUser";
+
+            function joinGroupRequestFromUser(groupnameTmp, useridTmp) {
+            $.ajax({
+                        type: 'POST',
+                        url: rootURLjoinGroupRequestFromUser + '/' + groupnameTmp +'/' + useridTmp,
+                        success: function (result) {
+                            document.location.href="makeFriends.html";
+                        }
+                 });
+            }
+            
+            
+            
+            $(document).bind('pageinit', function(){
+               checkToken();
+               var useridSpecial = $.url().param("userid");
+                var useridParam = $.session.get('userid');
+                var groupnameParam = useridSpecial+" FRIENDS";
+               
+                
+               
+                $("#YesButton").bind("click", function(event,ui){
+                    
+                     joinGroupRequestFromUser(groupnameParam, useridParam);
+                    
+                 });
+                
+               $("#NoButton").bind("click", function(event,ui){
+                    document.location.href="makeFriends.html";
+		});
+
+            });
+	</script>
+	</head> 
+    <body>
+        
+        
+        <div data-role="page" id="joinGroupConfirm">
+            <div data-role="header">
+		<h1>Do you want<br> to send <br>request <br>to make friend<br> with this <br>person?</h1>
+            </div>
+	
+            <div data-role="content" data-theme="b">	
+		
+		<a href="#" id="YesButton" data-role="button" data-theme="c">Yes</a>
+                <a href="#" id="NoButton" data-role="button" data-theme="c">No</a>
+            </div>
+            
+	</div>
+  
+     </body>
+</html>
